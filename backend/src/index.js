@@ -29,7 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
 // Production static serving
-if (process.env.NODE_ENV === "production") {
+/*if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../frontend/dist");
 
   if (fs.existsSync(frontendPath)) {
@@ -41,7 +41,11 @@ if (process.env.NODE_ENV === "production") {
   } else {
     console.error(" Frontend dist folder not found:", frontendPath);
   }
-}
+}*/
+
+app.get('/',(req,res)=>{
+  res.send("server running");
+})
 
 // Start server
 server.listen(PORT, () => {
