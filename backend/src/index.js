@@ -19,10 +19,7 @@ const PORT = process.env.PORT || 5002;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: "https://olive-chat.vercel.app",
-  credentials: true,
-}));
+app.use(cors());
 
 // API routes
 app.use('/api/auth', authRoutes);
