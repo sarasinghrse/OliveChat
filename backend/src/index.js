@@ -24,10 +24,10 @@ app.use(cors({
   credentials: true,
 }));
 
-app.options("*", cors(
-  // origin: "https://olive-chat.vercel.app",
-  // credentials: true,
-));
+app.options("/", cors({
+  origin: "https://olive-chat.vercel.app",
+  credentials: true,
+}));
 
 
 // API routes
