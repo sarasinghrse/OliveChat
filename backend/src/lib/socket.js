@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173",
-              "https://olivechat-2.onrender.com"
+              "https://olive-chat.vercel.app"
     ],credentials:true,
   },
 });
