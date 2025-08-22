@@ -20,12 +20,12 @@ const PORT = process.env.PORT || 5002;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "https://olive-chat.vercel.app",
+  origin: "http://localhost:5173",
   credentials: true,
 }));
 
 app.options("/", cors({
-  origin: "https://olive-chat.vercel.app",
+  origin: "http://localhost:5173",
   credentials: true,
 }));
 

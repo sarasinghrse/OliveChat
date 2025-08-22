@@ -19,6 +19,17 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const token = localStorage.getItem("token");
+      
+      if (!token) {
+        set({ authUser: null, isCheckingAuth: false });
+        return;
+      }
+
+      // Basic token validation
+      if (!get().validateToken()) {
+        set({ authUser: null, isCheckingAuth: false });
+        return;
+      }
 
       const res = await axiosInstance.get("/auth/check", {
         headers: {
@@ -30,6 +41,7 @@ export const useAuthStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
+      localStorage.removeItem("token");
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -57,6 +69,7 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
+      localStorage.setItem('token', res.data.token);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
 
@@ -71,11 +84,16 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
+      localStorage.removeItem("token");
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      // Even if backend fails, clear local state and token
+      localStorage.removeItem("token");
+      set({ authUser: null });
+      get().disconnectSocket();
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   },
 
@@ -112,5 +130,25 @@ export const useAuthStore = create((set, get) => ({
   },
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
+  },
+
+  validateToken: () => {
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+    
+    try {
+      // Basic JWT validation (check if it's expired)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      
+      if (payload.exp < currentTime) {
+        localStorage.removeItem("token");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      localStorage.removeItem("token");
+      return false;
+    }
   },
 }));
