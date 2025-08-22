@@ -18,7 +18,13 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axiosInstance.get("/auth/check");
+      const token = localStorage.getItem("token");
+
+      const res = await axiosInstance.get("/auth/check", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       set({ authUser: res.data });
       get().connectSocket();
@@ -34,6 +40,9 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
+      console.log(res.data);
+      
+      localStorage.setItem('token', res.data.token)
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
